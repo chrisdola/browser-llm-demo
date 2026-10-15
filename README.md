@@ -31,14 +31,14 @@ The model menu is all `q4f16`. GPU memory is the weights plus a 4,096-token cont
 
 [Transformers.js](https://huggingface.co/docs/transformers.js) runs ONNX weights through ONNX Runtime. A second web worker owns the pipeline. It tries WebGPU when an adapter exists and falls back to WASM on the CPU when WebGPU is missing or the GPU session fails. The first Load fetches the chosen repo from Hugging Face into the cache. Tokens stream from the tokenizer and stop at 512 new tokens.
 
-The weight menu:
+Download is the ONNX file for that dtype. GPU memory is that file plus a 4,096-token cache in float32, the same context length the WebLLM table uses. These presets keep the cache in float32. The cache grows as the chat gets longer, and a reply here stops at 512 new tokens, so a short chat stays under the figure. On WASM this memory is the browser heap. The ONNX runtime also keeps a workspace above the table.
 
 
-| Weights                                 | Download     |
-| --------------------------------------- | ------------ |
-| Qwen2.5 0.5B Instruct `q4`              | about 750 MB |
-| Qwen2.5 1.5B Instruct `q4f16` (default) | about 1.2 GB |
-| SmolLM2 1.7B Instruct `q4`              | about 1.4 GB |
+| Weights                                 | GPU memory   | Download     |
+| --------------------------------------- | ------------ | ------------ |
+| Qwen2.5 0.5B Instruct `q4`              | about 850 MB | about 750 MB |
+| Qwen2.5 1.5B Instruct `q4f16` (default) | about 1.4 GB | about 1.2 GB |
+| SmolLM2 1.7B Instruct `q4`              | about 2.8 GB | about 1.4 GB |
 
 
 **Strengths.** It still runs when WebGPU is unavailable, which is the reason to pick it over WebLLM on a machine with no adapter. The same chat can compare a Qwen or SmolLM checkpoint here with the WebLLM build of a similar size. This demo only generates text.
@@ -49,9 +49,17 @@ The weight menu:
 
 The [Prompt API](https://developer.chrome.com/docs/ai/prompt-api) calls Gemini Nano through `LanguageModel` on the main thread. Desktop Chrome 148+ and Edge expose it. This page ships no weights and cannot choose the checkpoint or the quantization. Load checks availability and, when Chrome still needs the model, downloads the browser's copy. Replies come from `promptStreaming()`. Each send opens a fresh session with the earlier messages as the initial prompt.
 
+GPU inference needs more than 4 GB of VRAM. CPU inference needs 16 GB of RAM and 4 cores. Chrome downloads a 2B or 4B Gemini Nano, chosen from a GPU check, and the file size changes when the browser updates the model. The installed size is listed on `chrome://on-device-internals`. The profile volume needs 22 GB free before that download starts.
+
+
+| Model       | GPU memory                                      | Download                         |
+| ----------- | ----------------------------------------------- | -------------------------------- |
+| Gemini Nano | more than 4 GB of VRAM, or 16 GB of RAM on CPU | 2B or 4B, size set by Chrome     |
+
+
 **Strengths.** Chrome downloads Gemini Nano on the first Load and keeps that copy for later visits, including on other sites. This page does not host the file, and Chrome updates it after it is installed. When Nano is already on the machine, Load is the short path of the three.
 
-**Limits.** `LanguageModel` has to exist. In this demo that means desktop Chrome 148+ or Edge; other browsers leave Load disabled, and the other two runtimes still work. The device also has to be able to run Gemini Nano, which Chrome reports as unavailable on some hardware. The web API exposes no sampling controls and no token cap, so length is left to the shared system prompt. The session in this demo expects English text in and English text out. Quality and context size are whatever the browser installed, and this page cannot swap in another model.
+**Limits.** `LanguageModel` has to exist. In this demo that means desktop Chrome 148+ or Edge; other browsers leave Load disabled, and the other two runtimes still work. Chrome reports the model as unavailable on hardware below the memory in the table. The web API exposes no sampling controls and no token cap, so length is left to the shared system prompt. The session in this demo expects English text in and English text out. Quality and context size are whatever the browser installed, and this page cannot swap in another model.
 
 
 

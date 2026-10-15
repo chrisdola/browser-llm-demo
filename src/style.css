@@ -265,8 +265,13 @@ button.info[aria-expanded="true"] {
 .weights {
   display: grid;
   gap: 0.35rem;
-  width: min(100%, 22rem);
+  width: 100%;
   margin: 0 0 0.2rem;
+}
+
+.size-key {
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .weights[hidden] { display: none; }

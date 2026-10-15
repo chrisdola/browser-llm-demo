@@ -22,7 +22,7 @@ import {
 } from "./engines/webllm-models";
 
 const MODEL_NOTES: Record<Exclude<EngineId, "transformers" | "webllm">, string> = {
-  "prompt-api": "Gemini Nano · downloaded by the browser",
+  "prompt-api": "Gemini Nano · more than 4 GB VRAM, or 16 GB RAM · download size set by Chrome",
 };
 
 const webllm = createWebLLMEngine();
