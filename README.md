@@ -10,17 +10,17 @@ All three engines share the same chat and the same system prompt: answer the lat
 
 [WebLLM](https://webllm.mlc.ai/) runs models that MLC has already compiled into WebGPU chat kernels. A web worker owns the engine, so generation stays off the UI thread. Replies stream through an OpenAI-style chat API at temperature 0.7 and stop at 512 new tokens.
 
-The model menu is all `q4f16`. The sizes below are GPU memory for the weights plus a 4,096-token context, from the package's prebuilt catalog:
+The model menu is all `q4f16`. GPU memory is the weights plus a 4,096-token context, from the package's prebuilt catalog. Download is the weight shards from each model's `ndarray-cache.json`. The first Load also fetches a compiled WebGPU library of about 6 MB, plus the tokenizer and config.
 
 
-| Model                  | GPU memory   |
-| ---------------------- | ------------ |
-| SmolLM2 360M (default) | about 380 MB |
-| Llama 3.2 1B           | about 880 MB |
-| Qwen2.5 1.5B           | about 1.6 GB |
-| SmolLM2 1.7B           | about 1.8 GB |
-| Llama 3.2 3B           | about 2.3 GB |
-| Qwen2.5 3B             | about 2.5 GB |
+| Model                  | GPU memory   | Download     |
+| ---------------------- | ------------ | ------------ |
+| SmolLM2 360M (default) | about 380 MB | about 194 MB |
+| Llama 3.2 1B           | about 880 MB | about 663 MB |
+| Qwen2.5 1.5B           | about 1.6 GB | about 828 MB |
+| SmolLM2 1.7B           | about 1.8 GB | about 918 MB |
+| Llama 3.2 3B           | about 2.3 GB | about 1.7 GB |
+| Qwen2.5 3B             | about 2.5 GB | about 1.6 GB |
 
 
 **Strengths.** The kernels are built for chat, so a loaded model is usually the fastest of the two shipped runtimes. The worker keeps the page responsive while tokens stream. Weights stay in the browser cache after the first Load.
